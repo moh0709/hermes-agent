@@ -83,7 +83,7 @@ Ask the agent to schedule a cron job with a prompt like:
 
 > Every 15 minutes, run `watch_rss.py --name hn --url https://news.ycombinator.com/rss`. If it prints anything, summarize the headlines and deliver them. If it prints nothing, stay silent.
 
-The agent invokes the script via the terminal tool inside the cron job's agent loop; no changes to cron's built-in `--script` flag are needed.
+The agent invokes the script via the terminal tool inside the cron job's agent loop; no changes to cron's built-in `--script` flag are needed. If you use a launcher that can run in multiple startup modes, set an explicit runtime signal (`HERMES_RUNTIME_MODE=POLLING` for task-poller launches or `HERMES_RUNTIME_MODE=WEBHOOK` / `GITHUB_EVENT_PATH=...` for webhook launches) before the script starts.
 
 ## State files
 

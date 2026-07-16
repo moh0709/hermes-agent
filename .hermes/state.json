@@ -1,0 +1,31 @@
+{
+  "status": "BLOCKED",
+  "currentIssue": {
+    "repo": "moh0709/everythingAI",
+    "number": 71,
+    "title": "EAI-TASK-039B: Deploy runtime-mode routing to live Hermes gateway"
+  },
+  "currentTask": "EAI-TASK-039B",
+  "startingCommitSha": "b2ac1c24e2171b9662cac50ed9ccf5327700e146",
+  "branch": "eai-task-039b",
+  "publication": {
+    "state": "blocked",
+    "targetRepo": "moh0709/hermes-agent",
+    "remote": "myfork",
+    "blocker": "GitHub push requires workflow scope on the authorized token"
+  },
+  "artifacts": {
+    "report": "REPORTS/EAI-TASK-039B-LIVE-GATEWAY-RUNTIME-ROLLOUT.md",
+    "handover": "docs/HANDOVER_2026-07-15_EAI_TASK_039B.json",
+    "log": "LOGS/EAI-TASK-039B-terminal.log"
+  },
+  "claim": {
+    "labelAdded": "hermes:working",
+    "labelRemoved": "hermes:ready",
+    "issueCommentPosted": true
+  },
+  "notes": [
+    "Need to publish the branch to the reviewable fork over HTTPS because SSH push is blocked in this environment.",
+    "Do not mark PASS yet."
+  ]
+}

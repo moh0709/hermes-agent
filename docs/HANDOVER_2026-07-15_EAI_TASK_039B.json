@@ -1,0 +1,48 @@
+{
+  "task": "EAI-TASK-039B",
+  "issue": 71,
+  "repo": "moh0709/hermes-agent",
+  "sourceRepo": "NousResearch/hermes-agent",
+  "branch": "eai-task-039b",
+  "status": "BLOCKED",
+  "localStartSha": "b2ac1c24e2171b9662cac50ed9ccf5327700e146",
+  "publication": {
+    "state": "blocked",
+    "summary": "HTTPS push to the fork remote was rejected by GitHub because the authorized token does not include the workflow scope required for this repository push path.",
+    "remediation": [
+      "authorize a token with repo, workflow scope",
+      "or complete gh auth refresh -h github.com -s workflow in a logged-in browser",
+      "retry the push to moh0709/hermes-agent",
+      "create or update a reviewable PR from the fork branch"
+    ]
+  },
+  "implementedChanges": [
+    "optional-skills/devops/watchers/SKILL.md",
+    "optional-skills/devops/watchers/scripts/watch_github.py",
+    "optional-skills/devops/watchers/scripts/runtime_mode.py",
+    "tests/skills/test_watch_github_runtime_mode.py"
+  ],
+  "validation": {
+    "passed": [
+      "scripts/run_tests.sh tests/gateway/test_webhook_dynamic_routes.py tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q",
+      "git diff --check"
+    ],
+    "notes": [
+      "node --test tests/*.test.mjs found no tests in this checkout",
+      "node scripts/framework-doctor.mjs is not present in this checkout",
+      "npm test is not defined in the root package.json",
+      "direct pytest needs addopts suppression in this environment because the repo config injects timeout flags unavailable to the raw invocation"
+    ]
+  },
+  "artifacts": {
+    "report": "REPORTS/EAI-TASK-039B-LIVE-GATEWAY-RUNTIME-ROLLOUT.md",
+    "handover": "docs/HANDOVER_2026-07-15_EAI_TASK_039B.json",
+    "log": "LOGS/EAI-TASK-039B-terminal.log",
+    "state": ".hermes/state.json"
+  },
+  "nextStep": "Obtain a token with workflow scope, retry the fork push, and then post the reviewable branch/commit back to issue #71.",
+  "safety": {
+    "secretsExcluded": true,
+    "destructiveCommandsUsed": false
+  }
+}
