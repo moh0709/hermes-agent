@@ -14,7 +14,8 @@ The reviewable implementation is already published on the fork branch:
 
 - branch: `eai-task-039b-review`
 - PR: `https://github.com/moh0709/hermes-agent/pull/1`
-- reviewable head SHA: `26e26f1870777a7ca1853bbdf18fc789699efcf2`
+- reviewable head SHA: `5503782b770e48b5a49d7622c0787bd768aed89c`
+- final pushed SHA: `5503782b770e48b5a49d7622c0787bd768aed89c`
 
 ## Live gateway evidence
 

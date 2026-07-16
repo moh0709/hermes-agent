@@ -6,8 +6,8 @@
   "branch": "eai-task-039b-review",
   "status": "COMPLETED",
   "localStartSha": "b2ac1c24e2171b9662cac50ed9ccf5327700e146",
-  "reviewableHeadSha": "26e26f1870777a7ca1853bbdf18fc789699efcf2",
-  "finalPublishedSha": "26e26f1870777a7ca1853bbdf18fc789699efcf2",
+  "reviewableHeadSha": "5503782b770e48b5a49d7622c0787bd768aed89c",
+  "finalPublishedSha": "5503782b770e48b5a49d7622c0787bd768aed89c",
   "publication": {
     "state": "published",
     "summary": "The reviewable branch was published to the fork remote and is available for review.",
