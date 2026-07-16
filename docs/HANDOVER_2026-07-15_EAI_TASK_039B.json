@@ -3,18 +3,15 @@
   "issue": 71,
   "repo": "moh0709/hermes-agent",
   "sourceRepo": "NousResearch/hermes-agent",
-  "branch": "eai-task-039b",
-  "status": "BLOCKED",
+  "branch": "eai-task-039b-review",
+  "status": "COMPLETED",
   "localStartSha": "b2ac1c24e2171b9662cac50ed9ccf5327700e146",
+  "reviewableHeadSha": "26e26f1870777a7ca1853bbdf18fc789699efcf2",
+  "finalPublishedSha": "26e26f1870777a7ca1853bbdf18fc789699efcf2",
   "publication": {
-    "state": "blocked",
-    "summary": "HTTPS push to the fork remote was rejected by GitHub because the authorized token does not include the workflow scope required for this repository push path.",
-    "remediation": [
-      "authorize a token with repo, workflow scope",
-      "or complete gh auth refresh -h github.com -s workflow in a logged-in browser",
-      "retry the push to moh0709/hermes-agent",
-      "create or update a reviewable PR from the fork branch"
-    ]
+    "state": "published",
+    "summary": "The reviewable branch was published to the fork remote and is available for review.",
+    "remediation": []
   },
   "implementedChanges": [
     "optional-skills/devops/watchers/SKILL.md",
@@ -24,14 +21,13 @@
   ],
   "validation": {
     "passed": [
-      "scripts/run_tests.sh tests/gateway/test_webhook_dynamic_routes.py tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q",
-      "git diff --check"
+      "scripts/run_tests.sh tests/gateway/test_slack_compat_module.py tests/gateway/test_webhook_dynamic_routes.py tests/gateway/test_webhook_adapter.py tests/gateway/test_webhook_deliver_only.py tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q",
+      "git diff --check",
+      "hermes send --json --to telegram \"EAI-TASK-039B verification: gateway.runtime routing remains isolated and Telegram send still works.\""
     ],
     "notes": [
-      "node --test tests/*.test.mjs found no tests in this checkout",
-      "node scripts/framework-doctor.mjs is not present in this checkout",
-      "npm test is not defined in the root package.json",
-      "direct pytest needs addopts suppression in this environment because the repo config injects timeout flags unavailable to the raw invocation"
+      "The gateway was restarted successfully and the Telegram path sent a live message after restart.",
+      "The webhook route github-ready-issues is forced to log delivery, not Telegram delivery."
     ]
   },
   "artifacts": {
@@ -40,7 +36,7 @@
     "log": "LOGS/EAI-TASK-039B-terminal.log",
     "state": ".hermes/state.json"
   },
-  "nextStep": "Obtain a token with workflow scope, retry the fork push, and then post the reviewable branch/commit back to issue #71.",
+  "nextStep": "Issue #71 can be moved to pm:review / hermes:done and the task is complete.",
   "safety": {
     "secretsExcluded": true,
     "destructiveCommandsUsed": false
