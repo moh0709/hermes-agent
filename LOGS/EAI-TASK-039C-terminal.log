@@ -1,0 +1,26 @@
+[2026-07-16 23:07:43 CEST] systemctl status hermes-gateway
+MainPID=3384618
+ExecMainStartTimestamp=Thu 2026-07-16 23:07:43 CEST
+ActiveState=active
+SubState=running
+
+[2026-07-16 23:08:28 CEST] gateway logs after restart
+- gateway.platforms.webhook forced github-ready-issues to log delivery
+- Telegram connect started cleanly
+- no BLOCKED_RUNTIME_CONTRACT observed
+
+[2026-07-16 23:15:?? UTC] hermes send live probe
+Command: hermes send --json --to telegram "EAI-TASK-039C verification: gateway.platforms.slack import path is available."
+Result:
+{
+  "success": true,
+  "platform": "telegram",
+  "chat_id": "5088875211",
+  "message_id": "2161",
+  "note": "Sent to telegram home channel (chat_id: 5088875211)",
+  "mirrored": true
+}
+
+[2026-07-16 23:15:?? UTC] test validation
+Command: scripts/run_tests.sh tests/gateway/test_slack_compat_module.py tests/gateway/test_webhook_dynamic_routes.py tests/gateway/test_webhook_adapter.py tests/gateway/test_webhook_deliver_only.py tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q
+Result: 5 files, 119 tests passed, 0 failed

@@ -1,23 +1,23 @@
 {
-  "status": "BLOCKED",
+  "status": "IN_PROGRESS",
   "currentIssue": {
     "repo": "moh0709/everythingAI",
-    "number": 71,
-    "title": "EAI-TASK-039B: Deploy runtime-mode routing to live Hermes gateway"
+    "number": 72,
+    "title": "EAI-TASK-039C: Repair Hermes gateway platform import and restore message delivery"
   },
-  "currentTask": "EAI-TASK-039B",
-  "startingCommitSha": "b2ac1c24e2171b9662cac50ed9ccf5327700e146",
-  "branch": "eai-task-039b",
+  "currentTask": "EAI-TASK-039C",
+  "startingCommitSha": "26e26f1870777a7ca1853bbdf18fc789699efcf2",
+  "branch": "eai-task-039c",
   "publication": {
-    "state": "blocked",
+    "state": "published",
     "targetRepo": "moh0709/hermes-agent",
     "remote": "myfork",
-    "blocker": "GitHub push requires workflow scope on the authorized token"
+    "branch": "eai-task-039c"
   },
   "artifacts": {
-    "report": "REPORTS/EAI-TASK-039B-LIVE-GATEWAY-RUNTIME-ROLLOUT.md",
-    "handover": "docs/HANDOVER_2026-07-15_EAI_TASK_039B.json",
-    "log": "LOGS/EAI-TASK-039B-terminal.log"
+    "report": "REPORTS/EAI-TASK-039C-GATEWAY-PLATFORM-IMPORT-REPAIR.md",
+    "handover": "docs/HANDOVER_2026-07-16_EAI_TASK_039C.json",
+    "log": "LOGS/EAI-TASK-039C-terminal.log"
   },
   "claim": {
     "labelAdded": "hermes:working",
@@ -25,7 +25,7 @@
     "issueCommentPosted": true
   },
   "notes": [
-    "Need to publish the branch to the reviewable fork over HTTPS because SSH push is blocked in this environment.",
-    "Do not mark PASS yet."
+    "Fix the legacy gateway.platforms.slack import path with a lazy compatibility shim.",
+    "Validate live Telegram send after gateway restart, then publish evidence and re-release EAI-TASK-039B."
   ]
 }
