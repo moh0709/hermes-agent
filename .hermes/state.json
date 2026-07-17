@@ -1,12 +1,12 @@
 {
-  "status": "COMPLETED",
+  "status": "IN_PROGRESS",
   "currentIssue": {
     "repo": "moh0709/everythingAI",
     "number": 71,
     "title": "EAI-TASK-039B: Deploy runtime-mode routing to live Hermes gateway"
   },
   "currentTask": "EAI-TASK-039B",
-  "startingCommitSha": "b2ac1c24e2171b9662cac50ed9ccf5327700e146",
+  "startingCommitSha": "df1ef94db588f30cfedd66b0e58c68d9be7bd06a",
   "branch": "eai-task-039b-review",
   "publication": {
     "state": "published",
@@ -17,7 +17,8 @@
   "artifacts": {
     "report": "REPORTS/EAI-TASK-039B-LIVE-GATEWAY-RUNTIME-ROLLOUT.md",
     "handover": "docs/HANDOVER_2026-07-15_EAI_TASK_039B.json",
-    "log": "LOGS/EAI-TASK-039B-terminal.log"
+    "log": "LOGS/EAI-TASK-039B-terminal.log",
+    "state": ".hermes/state.json"
   },
   "claim": {
     "labelAdded": "hermes:working",
@@ -25,8 +26,8 @@
     "issueCommentPosted": true
   },
   "notes": [
-    "The runtime-mode routing fix is published and reviewable.",
-    "The live gateway restart and Telegram send succeeded after the Slack import compatibility fix.",
-    "#72 was completed first because it removed the runtime blocker; EAI-TASK-039B could then be finalized."
+    "Resuming #71 for the corrected live process-separation evidence.",
+    "Validated explicit POLLING mode, separate gateway process, and WEBHOOK rejection for the polling watcher.",
+    "The polling worker discovery run was non-mutating and used a disposable local watermark name."
   ]
 }

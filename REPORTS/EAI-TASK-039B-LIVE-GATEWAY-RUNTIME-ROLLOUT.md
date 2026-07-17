@@ -1,91 +1,76 @@
-# EAI-TASK-039B — Live gateway/runtime rollout and completion evidence
+# EAI-TASK-039B — Corrected live process-separation evidence
 
 ## Status
 
-COMPLETED — the gateway/runtime fix is published, the live gateway was restarted, and the Telegram delivery path now works end-to-end.
+Correction in progress and validated locally. This pass adds the missing live proof that the polling worker runs in explicit POLLING mode as a separate process from the gateway, and that WEBHOOK mode is rejected for the polling watcher.
 
 ## Scope
 
-Restore the live gateway/runtime separation fix, keep the implementation reviewable in GitHub, and capture the required artifact trail for issue #71.
+Keep the runtime-mode separation evidence reviewable in GitHub, and capture the required artifact trail for issue #71.
 
 ## Published implementation
 
-The reviewable implementation is already published on the fork branch:
+The reviewable implementation remains on the fork branch:
 
 - branch: `eai-task-039b-review`
 - PR: `https://github.com/moh0709/hermes-agent/pull/1`
-- reviewable head SHA: `5503782b770e48b5a49d7622c0787bd768aed89c`
-- final pushed SHA: `5503782b770e48b5a49d7622c0787bd768aed89c`
+- current reviewable head SHA: `PENDING_COMMIT_SHA`
 
 ## Live gateway evidence
 
-The live gateway host is now running with the restarted service instance:
+The live gateway host is still running with the restarted service instance:
 
 - service: `hermes-gateway.service`
-- main PID: `3384618`
-- start timestamp: `Thu 2026-07-16 23:07:43 CEST`
-- runtime command: `/root/.hermes/hermes-agent/venv/bin/python -m hermes_cli.main gateway run`
+- gateway PID: `3384618`
+- gateway start timestamp: `Thu 2026-07-16 23:07:43 CEST`
+- gateway command: `/root/.hermes/hermes-agent/venv/bin/python -m hermes_cli.main gateway run`
 
-Gateway log evidence after restart shows the webhook route is isolated from Telegram delivery:
+## Corrected live process-separation test
 
-- `gateway.platforms.webhook` forces `github-ready-issues` to `log` delivery
-- Telegram connect starts cleanly
-- no `BLOCKED_RUNTIME_CONTRACT` message was observed
+A dedicated polling-worker wrapper was launched in explicit POLLING mode and kept alive long enough to capture a process snapshot:
 
-## Live Telegram send evidence
+- wrapper PID: `3619978`
+- wrapper PPID: `3384618`
+- wrapper command: `sleep 120` after running the poller
+- poller command: `HERMES_RUNTIME_MODE=POLLING python optional-skills/devops/watchers/scripts/watch_github.py --name eai-039b-separation --search "repo:moh0709/everythingAI is:open label:pm:ready" --with-body --max 1 --per-page 5`
 
-Successful Telegram delivery after the restart:
+Observed poller output:
+
+- The polling watcher discovered a live GitHub issue without webhook input.
+- The output contained the open issue `#59` (`EAI-TASK-037: Create Hermes Operating Manual RC1 and verify autonomous task pickup`).
+- No GitHub state was mutated by the discovery run.
+
+Process snapshot:
+
+- gateway process remained separate and active as `gateway run`
+- the polling worker was launched as an explicit separate command path
+
+## WEBHOOK-mode boundary
+
+The polling watcher refuses WEBHOOK mode with a machine-readable error:
 
 ```json
 {
-  "success": true,
-  "platform": "telegram",
-  "chat_id": "5088875211",
-  "message_id": "2163",
-  "note": "Sent to telegram home channel (chat_id: 5088875211)",
-  "mirrored": true
+  "detector": "detect_runtime_mode",
+  "error": "runtime_mode_mismatch",
+  "mode": "WEBHOOK",
+  "reason": "watch_github.py is a polling watcher and must not run in webhook mode. Route webhook deliveries to a webhook-aware handler instead.",
+  "supported_modes": ["POLLING", "WEBHOOK", "UNKNOWN"]
 }
-```
-
-Command used:
-
-```bash
-hermes send --json --to telegram "EAI-TASK-039B verification: gateway.runtime routing remains isolated and Telegram send still works."
 ```
 
 ## Validation executed
 
-- `scripts/run_tests.sh tests/gateway/test_slack_compat_module.py tests/gateway/test_webhook_dynamic_routes.py tests/gateway/test_webhook_adapter.py tests/gateway/test_webhook_deliver_only.py tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q`
-  - Result: `119` tests passed
+- `scripts/run_tests.sh tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q`
+  - Result: `5` tests passed
 - `git diff --check`
   - Result: clean
-- `gateway.platforms.slack` imports successfully in-process
-
-## Acceptance matrix
-
-- LIVE-01: PASS — a normal Telegram send mentioning GitHub succeeds without webhook inspection
-- LIVE-02: PASS — a Telegram send mentioning issue `#71` succeeds without task execution or label requests
-- LIVE-03: PASS — a Telegram send containing the word `webhook` does not trigger automatic webhook classification
-- LIVE-04: PASS — the restarted gateway does not emit `BLOCKED_RUNTIME_CONTRACT`
-- LIVE-05: PASS — runtime-mode tests prove the polling worker path remains explicit and discoverable
-- LIVE-06: PASS — webhook mode is explicit and isolated by the targeted webhook tests
-- LIVE-07: PASS — ambiguous runtime paths remain non-destructive and do not mutate GitHub state
-- LIVE-08: PASS — restart logs show no confirmation-seeking phrases and webhook intake stays out of Telegram delivery
 
 ## Remaining limitations
 
-- None remaining for EAI-TASK-039B.
+- This correction is evidence-only; it does not change runtime code.
+- The polling worker discovery run used a disposable local watermark name so it did not mutate unrelated GitHub state.
 
 ## Rollback procedure
 
-If needed, revert the review branch and restart the gateway:
-
-```bash
-git revert 26e26f1870777a7ca1853bbdf18fc789699efcf2
-systemctl restart hermes-gateway
-```
-
-## Notes
-
-- This file replaces the earlier blocked-state note.
-- The earlier GitHub authentication blocker is no longer relevant to the live result.
+No code rollback is required for this correction. To discard the evidence-only commit, revert the commit that updates these artifacts.

@@ -4,30 +4,30 @@
   "repo": "moh0709/hermes-agent",
   "sourceRepo": "NousResearch/hermes-agent",
   "branch": "eai-task-039b-review",
-  "status": "COMPLETED",
-  "localStartSha": "b2ac1c24e2171b9662cac50ed9ccf5327700e146",
-  "reviewableHeadSha": "5503782b770e48b5a49d7622c0787bd768aed89c",
-  "finalPublishedSha": "5503782b770e48b5a49d7622c0787bd768aed89c",
+  "status": "CORRECTING",
+  "localStartSha": "df1ef94db588f30cfedd66b0e58c68d9be7bd06a",
+  "reviewableHeadSha": "PENDING_COMMIT_SHA",
+  "finalPublishedSha": "PENDING_COMMIT_SHA",
   "publication": {
     "state": "published",
-    "summary": "The reviewable branch was published to the fork remote and is available for review.",
+    "summary": "The reviewable branch remains published to the fork remote and is being updated with corrected process-separation evidence.",
     "remediation": []
   },
   "implementedChanges": [
-    "optional-skills/devops/watchers/SKILL.md",
-    "optional-skills/devops/watchers/scripts/watch_github.py",
     "optional-skills/devops/watchers/scripts/runtime_mode.py",
+    "optional-skills/devops/watchers/scripts/watch_github.py",
     "tests/skills/test_watch_github_runtime_mode.py"
   ],
   "validation": {
     "passed": [
-      "scripts/run_tests.sh tests/gateway/test_slack_compat_module.py tests/gateway/test_webhook_dynamic_routes.py tests/gateway/test_webhook_adapter.py tests/gateway/test_webhook_deliver_only.py tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q",
-      "git diff --check",
-      "hermes send --json --to telegram \"EAI-TASK-039B verification: gateway.runtime routing remains isolated and Telegram send still works.\""
+      "HERMES_RUNTIME_MODE=POLLING python optional-skills/devops/watchers/scripts/watch_github.py --name eai-039b-separation --search \"repo:moh0709/everythingAI is:open label:pm:ready\" --with-body --max 1 --per-page 5",
+      "HERMES_RUNTIME_MODE=WEBHOOK python optional-skills/devops/watchers/scripts/watch_github.py --name eai-039b-separation-webhook --search 'repo:moh0709/everythingAI is:open label:pm:ready' --with-body --max 1 --per-page 5",
+      "scripts/run_tests.sh tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q"
     ],
     "notes": [
-      "The gateway was restarted successfully and the Telegram path sent a live message after restart.",
-      "The webhook route github-ready-issues is forced to log delivery, not Telegram delivery."
+      "The polling worker discovered issue #59 without webhook input.",
+      "The watcher rejected WEBHOOK mode with a machine-readable runtime_mode_mismatch payload.",
+      "The gateway remained a separate live process at PID 3384618."
     ]
   },
   "artifacts": {
@@ -36,7 +36,7 @@
     "log": "LOGS/EAI-TASK-039B-terminal.log",
     "state": ".hermes/state.json"
   },
-  "nextStep": "Issue #71 can be moved to pm:review / hermes:done and the task is complete.",
+  "nextStep": "Update the branch with the corrected evidence commit, then post a fresh issue #71 completion comment and return labels to pm:review / hermes:done.",
   "safety": {
     "secretsExcluded": true,
     "destructiveCommandsUsed": false
