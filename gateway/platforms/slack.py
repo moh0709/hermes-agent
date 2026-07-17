@@ -32,33 +32,50 @@ _LAZY_EXPORTS = {
     "_standalone_send",
 }
 
+_SLACK_ADAPTER_IMPORT = "plugins.platforms.slack.adapter"
 
-def __getattr__(name: str) -> Any:
-    if name not in _LAZY_EXPORTS:
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
-    from plugins.platforms.slack.adapter import (  # local import on purpose
-        SLACK_AVAILABLE,
-        SlackAdapter,
-        _standalone_send,
-        check_slack_requirements,
-        interactive_setup,
-    )
+def _load_slack_plugin() -> Any:
+    try:
+        from plugins.platforms.slack.adapter import (  # local import on purpose
+            SLACK_AVAILABLE,
+            SlackAdapter,
+            _standalone_send,
+            check_slack_requirements,
+            interactive_setup,
+            register as plugin_register,
+        )
+    except ImportError as exc:
+        missing_name = getattr(exc, "name", "") or ""
+        missing_text = str(exc)
+        if missing_name.startswith("plugins.platforms.slack") or _SLACK_ADAPTER_IMPORT in missing_text:
+            raise RuntimeError(
+                "Slack platform is enabled, but its adapter module could not be "
+                f"imported ({_SLACK_ADAPTER_IMPORT}). Disable Slack or install the "
+                "Slack adapter dependencies before enabling the platform."
+            ) from exc
+        raise
 
-    exports = {
+    return {
         "SlackAdapter": SlackAdapter,
         "SLACK_AVAILABLE": SLACK_AVAILABLE,
         "check_slack_requirements": check_slack_requirements,
         "interactive_setup": interactive_setup,
         "_standalone_send": _standalone_send,
+        "register": plugin_register,
     }
-    return exports[name]
+
+
+def __getattr__(name: str) -> Any:
+    if name not in _LAZY_EXPORTS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+    return _load_slack_plugin()[name]
 
 
 def register(ctx) -> None:
     """Forward the legacy gateway entry point to the bundled Slack plugin."""
-    from plugins.platforms.slack.adapter import register as plugin_register
-
+    plugin_register = _load_slack_plugin()["register"]
     plugin_register(ctx)
 
 
