@@ -4,30 +4,31 @@
   "repo": "moh0709/hermes-agent",
   "sourceRepo": "NousResearch/hermes-agent",
   "branch": "eai-task-039b-review",
-  "status": "CORRECTING",
+  "status": "READY_FOR_REVIEW",
   "localStartSha": "df1ef94db588f30cfedd66b0e58c68d9be7bd06a",
-  "reviewableHeadSha": "d8d10880a55c800c3cc0602272801b730cdb0858",
-  "finalPublishedSha": "d8d10880a55c800c3cc0602272801b730cdb0858",
+  "reviewableHeadSha": "19ba1ee6f62cfea0b39afa62ee87e8285d0d8353",
+  "finalPublishedSha": "19ba1ee6f62cfea0b39afa62ee87e8285d0d8353",
   "publication": {
     "state": "published",
-    "summary": "The reviewable branch remains published to the fork remote and is being updated with corrected process-separation evidence.",
+    "summary": "The reviewable branch remains published to the fork remote and now carries the corrected two-label queue-eligibility evidence.",
     "remediation": []
   },
   "implementedChanges": [
-    "optional-skills/devops/watchers/scripts/runtime_mode.py",
-    "optional-skills/devops/watchers/scripts/watch_github.py",
-    "tests/skills/test_watch_github_runtime_mode.py"
+    "report refresh for the two-label queue eligibility proof",
+    "handover refresh for the two-label queue eligibility proof",
+    "terminal log refresh with label-eligibility outputs",
+    "state refresh for PM review readiness"
   ],
   "validation": {
     "passed": [
-      "HERMES_RUNTIME_MODE=POLLING python optional-skills/devops/watchers/scripts/watch_github.py --name eai-039b-separation --search \"repo:moh0709/everythingAI is:open label:pm:ready\" --with-body --max 1 --per-page 5",
-      "HERMES_RUNTIME_MODE=WEBHOOK python optional-skills/devops/watchers/scripts/watch_github.py --name eai-039b-separation-webhook --search 'repo:moh0709/everythingAI is:open label:pm:ready' --with-body --max 1 --per-page 5",
-      "scripts/run_tests.sh tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q"
+      "gh issue list --repo moh0709/everythingAI --state open --label pm:ready --label hermes:ready --json number,title --jq '.[] | {number,title}'",
+      "gh issue list --repo moh0709/everythingAI --state open --label pm:ready --json number,title --jq '.[] | {number,title}'",
+      "gh issue view 74 --repo moh0709/everythingAI --json number,labels,title --jq '{number,title,labels:[.labels[].name]}'"
     ],
     "notes": [
-      "The polling worker discovered issue #59 without webhook input.",
-      "The watcher rejected WEBHOOK mode with a machine-readable runtime_mode_mismatch payload.",
-      "The gateway remained a separate live process at PID 3384618."
+      "The two-label queue returned issue #73 and the current issue #71, excluding the one-label negative control #74.",
+      "The one-label queue included the negative control #74, which is the intended control condition.",
+      "Disposable control issues #73 and #74 were closed after evidence capture."
     ]
   },
   "artifacts": {
@@ -36,7 +37,7 @@
     "log": "LOGS/EAI-TASK-039B-terminal.log",
     "state": ".hermes/state.json"
   },
-  "nextStep": "Update the branch with the corrected evidence commit, then post a fresh issue #71 completion comment and return labels to pm:review / hermes:done.",
+  "nextStep": "Commit the refreshed artifacts, push a new immutable SHA, and post the SHA back to issue #71 for PM review.",
   "safety": {
     "secretsExcluded": true,
     "destructiveCommandsUsed": false

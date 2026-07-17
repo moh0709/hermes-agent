@@ -22,12 +22,12 @@
   },
   "claim": {
     "labelAdded": "hermes:working",
-    "labelRemoved": "hermes:ready",
+    "labelRemoved": "hermes:done, pm:review",
     "issueCommentPosted": true
   },
   "notes": [
-    "Resuming #71 for the corrected live process-separation evidence.",
-    "Validated explicit POLLING mode, separate gateway process, and WEBHOOK rejection for the polling watcher.",
-    "The polling worker discovery run was non-mutating and used a disposable local watermark name."
+    "Resuming #71 for the corrected two-label queue-eligibility evidence.",
+    "Validated explicit two-label candidate selection with a one-label negative control.",
+    "Disposable control issues #73 and #74 were created for the test and closed after capture."
   ]
 }

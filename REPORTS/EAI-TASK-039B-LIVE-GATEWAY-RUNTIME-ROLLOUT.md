@@ -1,12 +1,12 @@
-# EAI-TASK-039B — Corrected live process-separation evidence
+# EAI-TASK-039B — Corrected two-label queue eligibility evidence
 
 ## Status
 
-Correction in progress and validated locally. This pass adds the missing live proof that the polling worker runs in explicit POLLING mode as a separate process from the gateway, and that WEBHOOK mode is rejected for the polling watcher.
+Ready for PM review. This correction replaces the earlier pm:ready-only search evidence with a real queue-eligibility check that requires both `pm:ready` and `hermes:ready`, plus a one-label negative control.
 
 ## Scope
 
-Keep the runtime-mode separation evidence reviewable in GitHub, and capture the required artifact trail for issue #71.
+Keep the queue-selection evidence reviewable in GitHub and capture the required artifact trail for issue #71.
 
 ## Published implementation
 
@@ -14,62 +14,68 @@ The reviewable implementation remains on the fork branch:
 
 - branch: `eai-task-039b-review`
 - PR: `https://github.com/moh0709/hermes-agent/pull/1`
-- current reviewable head SHA: `d8d10880a55c800c3cc0602272801b730cdb0858`
+- current reviewable head SHA: `19ba1ee6f62cfea0b39afa62ee87e8285d0d8353`
 
-## Live gateway evidence
+## Queue eligibility evidence
 
-The live gateway host is still running with the restarted service instance:
+Disposable live controls were created for the corrected test and then cleaned up after capture:
 
-- service: `hermes-gateway.service`
-- gateway PID: `3384618`
-- gateway start timestamp: `Thu 2026-07-16 23:07:43 CEST`
-- gateway command: `/root/.hermes/hermes-agent/venv/bin/python -m hermes_cli.main gateway run`
+- positive control: issue `#73` — `EAI-TASK-039B disposable positive control`
+  - labels: `pm:ready`, `hermes:ready`
+- negative control: issue `#74` — `EAI-TASK-039B disposable negative control`
+  - labels: `pm:ready`
 
-## Corrected live process-separation test
+### Two-label eligibility query
 
-A dedicated polling-worker wrapper was launched in explicit POLLING mode and kept alive long enough to capture a process snapshot:
+Command:
 
-- wrapper PID: `3619978`
-- wrapper PPID: `3384618`
-- wrapper command: `sleep 120` after running the poller
-- poller command: `HERMES_RUNTIME_MODE=POLLING python optional-skills/devops/watchers/scripts/watch_github.py --name eai-039b-separation --search "repo:moh0709/everythingAI is:open label:pm:ready" --with-body --max 1 --per-page 5`
+```bash
+gh issue list --repo moh0709/everythingAI --state open --label pm:ready --label hermes:ready --json number,title --jq '.[] | {number,title}'
+```
 
-Observed poller output:
-
-- The polling watcher discovered a live GitHub issue without webhook input.
-- The output contained the open issue `#59` (`EAI-TASK-037: Create Hermes Operating Manual RC1 and verify autonomous task pickup`).
-- No GitHub state was mutated by the discovery run.
-
-Process snapshot:
-
-- gateway process remained separate and active as `gateway run`
-- the polling worker was launched as an explicit separate command path
-
-## WEBHOOK-mode boundary
-
-The polling watcher refuses WEBHOOK mode with a machine-readable error:
+Observed result:
 
 ```json
-{
-  "detector": "detect_runtime_mode",
-  "error": "runtime_mode_mismatch",
-  "mode": "WEBHOOK",
-  "reason": "watch_github.py is a polling watcher and must not run in webhook mode. Route webhook deliveries to a webhook-aware handler instead.",
-  "supported_modes": ["POLLING", "WEBHOOK", "UNKNOWN"]
-}
+{"number":73,"title":"EAI-TASK-039B disposable positive control"}
+{"number":71,"title":"EAI-TASK-039B: Deploy runtime-mode routing to live Hermes gateway"}
 ```
+
+This proves the two-label queue candidate set includes the positive control and excludes the one-label negative control `#74`.
+
+### One-label negative control query
+
+Command:
+
+```bash
+gh issue list --repo moh0709/everythingAI --state open --label pm:ready --json number,title --jq '.[] | {number,title}'
+```
+
+Observed result included the negative control:
+
+```json
+{"number":74,"title":"EAI-TASK-039B disposable negative control"}
+```
+
+It also returned other pm:ready items, which is expected; the point of the negative control is that it appears in the one-label queue but not in the two-label queue.
+
+## Cleanup
+
+The disposable controls were closed after validation:
+
+- issue `#73` closed
+- issue `#74` closed
 
 ## Validation executed
 
-- `scripts/run_tests.sh tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q`
-  - Result: `5` tests passed
+- `gh issue list --repo moh0709/everythingAI --state open --label pm:ready --label hermes:ready --json number,title --jq '.[] | {number,title}'`
+- `gh issue list --repo moh0709/everythingAI --state open --label pm:ready --json number,title --jq '.[] | {number,title}'`
+- `gh issue view 74 --repo moh0709/everythingAI --json number,labels,title --jq '{number,title,labels:[.labels[].name]}'`
 - `git diff --check`
-  - Result: clean
 
 ## Remaining limitations
 
 - This correction is evidence-only; it does not change runtime code.
-- The polling worker discovery run used a disposable local watermark name so it did not mutate unrelated GitHub state.
+- The earlier pm:ready-only discovery run is superseded by this label-eligibility proof.
 
 ## Rollback procedure
 
