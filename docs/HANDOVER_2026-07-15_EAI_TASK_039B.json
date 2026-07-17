@@ -6,8 +6,8 @@
   "branch": "eai-task-039b-review",
   "status": "CORRECTING",
   "localStartSha": "df1ef94db588f30cfedd66b0e58c68d9be7bd06a",
-  "reviewableHeadSha": "PENDING_COMMIT_SHA",
-  "finalPublishedSha": "PENDING_COMMIT_SHA",
+  "reviewableHeadSha": "d8d10880a55c800c3cc0602272801b730cdb0858",
+  "finalPublishedSha": "d8d10880a55c800c3cc0602272801b730cdb0858",
   "publication": {
     "state": "published",
     "summary": "The reviewable branch remains published to the fork remote and is being updated with corrected process-separation evidence.",
