@@ -1,0 +1,42 @@
+[2026-07-16 23:07:43 CEST] systemctl status hermes-gateway
+MainPID=3384618
+ExecMainStartTimestamp=Thu 2026-07-16 23:07:43 CEST
+ActiveState=active
+SubState=running
+Command=/root/.hermes/hermes-agent/venv/bin/python -m hermes_cli.main gateway run
+
+[2026-07-16 23:18:?? UTC] corrected live process-separation test — polling worker
+Wrapper PID=3619978
+Wrapper PPID=3384618
+Poller command:
+HERMES_RUNTIME_MODE=POLLING python optional-skills/devops/watchers/scripts/watch_github.py --name eai-039b-separation --search "repo:moh0709/everythingAI is:open label:pm:ready" --with-body --max 1 --per-page 5
+Poller output:
+## EAI-TASK-037: Create Hermes Operating Manual RC1 and verify autonomous task pickup
+https://github.com/moh0709/everythingAI/issues/59
+
+[2026-07-16 23:18:?? UTC] corrected live process-separation test — webhook boundary
+Command:
+HERMES_RUNTIME_MODE=WEBHOOK python optional-skills/devops/watchers/scripts/watch_github.py --name eai-039b-separation-webhook --search 'repo:moh0709/everythingAI is:open label:pm:ready' --with-body --max 1 --per-page 5
+Result:
+{"detector": "detect_runtime_mode", "error": "runtime_mode_mismatch", "mode": "WEBHOOK", "reason": "watch_github.py is a polling watcher and must not run in webhook mode. Route webhook deliveries to a webhook-aware handler instead.", "supported_modes": ["POLLING", "WEBHOOK", "UNKNOWN"]}
+
+[2026-07-16 23:18:?? UTC] targeted validation
+Command: scripts/run_tests.sh tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q
+Result: 5 tests passed, 0 failed
+
+[2026-07-16 23:31:?? UTC] corrected label-eligibility test — two-label queue
+Command:
+gh issue list --repo moh0709/everythingAI --state open --label pm:ready --label hermes:ready --json number,title --jq '.[] | {number,title}'
+Result:
+{"number":73,"title":"EAI-TASK-039B disposable positive control"}
+{"number":71,"title":"EAI-TASK-039B: Deploy runtime-mode routing to live Hermes gateway"}
+
+[2026-07-16 23:31:?? UTC] corrected label-eligibility test — one-label negative control
+Command:
+gh issue list --repo moh0709/everythingAI --state open --label pm:ready --json number,title --jq '.[] | {number,title}'
+Result includes:
+{"number":74,"title":"EAI-TASK-039B disposable negative control"}
+
+[2026-07-16 23:31:?? UTC] cleanup
+Closed issue #73 (positive control)
+Closed issue #74 (negative control)

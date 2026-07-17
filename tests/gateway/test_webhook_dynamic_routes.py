@@ -49,6 +49,27 @@ class TestDynamicRouteLoading:
         adapter._reload_dynamic_routes()
         assert adapter._routes["conflict"]["secret"] == "static"
 
+    def test_github_issue_route_telegram_delivery_is_coerced_to_log(self, tmp_path, caplog):
+        import logging
+
+        (tmp_path / _DYNAMIC_ROUTES_FILENAME).write_text(
+            json.dumps(
+                {
+                    "github-ready-issues": {
+                        "secret": "dynamic-secret",
+                        "events": ["issues"],
+                        "prompt": "You are Hermes running for the EverythingAI repo. Inspect the payload and workspace automatically.",
+                        "deliver": "telegram",
+                    }
+                }
+            )
+        )
+        adapter = _make_adapter()
+        with caplog.at_level(logging.WARNING, logger="gateway.platforms.webhook"):
+            adapter._reload_dynamic_routes()
+        assert adapter._routes["github-ready-issues"]["deliver"] == "log"
+        assert any("forcing log delivery" in rec.message for rec in caplog.records)
+
     def test_mtime_gated(self, tmp_path):
         import time
         path = tmp_path / _DYNAMIC_ROUTES_FILENAME

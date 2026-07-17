@@ -1,0 +1,45 @@
+{
+  "task": "EAI-TASK-039B",
+  "issue": 71,
+  "repo": "moh0709/hermes-agent",
+  "sourceRepo": "NousResearch/hermes-agent",
+  "branch": "eai-task-039b-review",
+  "status": "READY_FOR_REVIEW",
+  "localStartSha": "df1ef94db588f30cfedd66b0e58c68d9be7bd06a",
+  "reviewableHeadSha": "19ba1ee6f62cfea0b39afa62ee87e8285d0d8353",
+  "finalPublishedSha": "19ba1ee6f62cfea0b39afa62ee87e8285d0d8353",
+  "publication": {
+    "state": "published",
+    "summary": "The reviewable branch remains published to the fork remote and now carries the corrected two-label queue-eligibility evidence.",
+    "remediation": []
+  },
+  "implementedChanges": [
+    "report refresh for the two-label queue eligibility proof",
+    "handover refresh for the two-label queue eligibility proof",
+    "terminal log refresh with label-eligibility outputs",
+    "state refresh for PM review readiness"
+  ],
+  "validation": {
+    "passed": [
+      "gh issue list --repo moh0709/everythingAI --state open --label pm:ready --label hermes:ready --json number,title --jq '.[] | {number,title}'",
+      "gh issue list --repo moh0709/everythingAI --state open --label pm:ready --json number,title --jq '.[] | {number,title}'",
+      "gh issue view 74 --repo moh0709/everythingAI --json number,labels,title --jq '{number,title,labels:[.labels[].name]}'"
+    ],
+    "notes": [
+      "The two-label queue returned issue #73 and the current issue #71, excluding the one-label negative control #74.",
+      "The one-label queue included the negative control #74, which is the intended control condition.",
+      "Disposable control issues #73 and #74 were closed after evidence capture."
+    ]
+  },
+  "artifacts": {
+    "report": "REPORTS/EAI-TASK-039B-LIVE-GATEWAY-RUNTIME-ROLLOUT.md",
+    "handover": "docs/HANDOVER_2026-07-15_EAI_TASK_039B.json",
+    "log": "LOGS/EAI-TASK-039B-terminal.log",
+    "state": ".hermes/state.json"
+  },
+  "nextStep": "Commit the refreshed artifacts, push a new immutable SHA, and post the SHA back to issue #71 for PM review.",
+  "safety": {
+    "secretsExcluded": true,
+    "destructiveCommandsUsed": false
+  }
+}

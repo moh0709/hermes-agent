@@ -30,6 +30,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _watermark import Watermark, format_items_as_markdown  # type: ignore
+from runtime_mode import RuntimeMode, detect_runtime_mode, runtime_mode_error  # type: ignore
 
 
 VALID_SCOPES = ("issues", "pulls", "releases", "commits")
@@ -66,6 +67,33 @@ def _flatten_issue_or_release(item):
 
 
 def main() -> int:
+    runtime_mode = detect_runtime_mode()
+    if runtime_mode is RuntimeMode.UNKNOWN:
+        print(
+            runtime_mode_error(
+                runtime_mode,
+                reason=(
+                    "Launcher did not declare whether this script started in polling "
+                    "or webhook mode. Set HERMES_RUNTIME_MODE=POLLING for task-poller "
+                    "launches or HERMES_RUNTIME_MODE=WEBHOOK / GITHUB_EVENT_PATH for webhook launches."
+                ),
+            ),
+            file=sys.stderr,
+        )
+        return 2
+    if runtime_mode is RuntimeMode.WEBHOOK:
+        print(
+            runtime_mode_error(
+                runtime_mode,
+                reason=(
+                    "watch_github.py is a polling watcher and must not run in webhook mode. "
+                    "Route webhook deliveries to a webhook-aware handler instead."
+                ),
+            ),
+            file=sys.stderr,
+        )
+        return 2
+
     p = argparse.ArgumentParser(description="Watch GitHub issues / pulls / releases / commits.")
     p.add_argument("--name", required=True, help="Watcher name (used for state file)")
     p.add_argument("--repo", default="",
