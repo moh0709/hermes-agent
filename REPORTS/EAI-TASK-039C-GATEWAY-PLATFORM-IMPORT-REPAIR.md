@@ -2,7 +2,7 @@
 
 ## Status
 
-Completed and validated locally against the live Hermes gateway host.
+Completed and validated locally against the live Hermes gateway host, with a follow-up deterministic regression correction for the Slack-disabled case.
 
 ## Root cause
 
@@ -23,7 +23,8 @@ Behavior:
 - keeps the legacy module path importable;
 - does not eagerly load the Slack plugin at gateway startup;
 - forwards `register(ctx)` to the plugin entry point;
-- exposes the expected Slack symbols lazily for compatibility.
+- exposes the expected Slack symbols lazily for compatibility;
+- translates a missing Slack adapter import into a clear Slack-specific runtime error.
 
 ## Tests added
 
@@ -32,7 +33,9 @@ Behavior:
 Covers:
 
 - import of `gateway.platforms.slack` without eagerly loading the Slack plugin;
-- `register()` forwarding to `plugins.platforms.slack.adapter.register()`.
+- `register()` forwarding to `plugins.platforms.slack.adapter.register()`;
+- deterministic failure when the Slack adapter is unavailable, with a clear Slack-specific error;
+- another platform path (`gateway.platforms.webhook`) remaining importable after the Slack-specific failure.
 
 ## Live gateway verification
 
@@ -79,7 +82,7 @@ scripts/run_tests.sh tests/gateway/test_slack_compat_module.py tests/gateway/tes
 Result:
 
 - 5 files
-- 119 tests passed
+- 120 tests passed
 - 0 failed
 
 Also verified:
@@ -87,6 +90,7 @@ Also verified:
 - `git diff --check` clean
 - `gateway.platforms.slack` imports successfully in-process
 - `hermes send --json --to telegram ...` succeeds
+- the new deterministic regression test for Slack-unavailable behavior passes
 
 ## Rollback procedure
 
@@ -101,7 +105,7 @@ If the gateway process must be preserved, re-enable the previous version only af
 
 ## Remaining limitations
 
-- Slack still depends on the actual plugin implementation when Slack is truly enabled.
+- Slack still depends on the real plugin when actually enabled.
 - This fix restores the legacy import path and prevents unrelated startup failures; it does not change Slack business logic.
 
 ## Files changed
@@ -109,3 +113,7 @@ If the gateway process must be preserved, re-enable the previous version only af
 - `gateway/platforms/slack.py`
 - `tests/gateway/test_slack_compat_module.py`
 - `.hermes/state.json`
+
+## Final pushed SHA
+
+- `867c15917be2e7bfb4f6f7a5b4d19cb4cc8b0f1f`

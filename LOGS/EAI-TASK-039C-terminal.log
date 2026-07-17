@@ -23,4 +23,8 @@ Result:
 
 [2026-07-16 23:15:?? UTC] test validation
 Command: scripts/run_tests.sh tests/gateway/test_slack_compat_module.py tests/gateway/test_webhook_dynamic_routes.py tests/gateway/test_webhook_adapter.py tests/gateway/test_webhook_deliver_only.py tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q
-Result: 5 files, 119 tests passed, 0 failed
+Result: 5 files, 120 tests passed, 0 failed
+
+[2026-07-16 23:18:?? UTC] deterministic Slack-unavailable regression test
+Command: scripts/run_tests.sh tests/gateway/test_slack_compat_module.py -- -o addopts='' -q
+Result: 3 tests passed, 0 failed

@@ -1,5 +1,5 @@
 {
-  "status": "IN_PROGRESS",
+  "status": "COMPLETED",
   "currentIssue": {
     "repo": "moh0709/everythingAI",
     "number": 72,
@@ -7,6 +7,7 @@
   },
   "currentTask": "EAI-TASK-039C",
   "startingCommitSha": "26e26f1870777a7ca1853bbdf18fc789699efcf2",
+  "finalCommitSha": "867c15917be2e7bfb4f6f7a5b4d19cb4cc8b0f1f",
   "branch": "eai-task-039c",
   "publication": {
     "state": "published",
@@ -26,6 +27,7 @@
   },
   "notes": [
     "Fix the legacy gateway.platforms.slack import path with a lazy compatibility shim.",
-    "Validate live Telegram send after gateway restart, then publish evidence and re-release EAI-TASK-039B."
+    "Validate live Telegram send after gateway restart, then publish evidence and re-release EAI-TASK-039B.",
+    "Added deterministic Slack-unavailable regression coverage and a clear Slack-specific adapter error boundary."
   ]
 }

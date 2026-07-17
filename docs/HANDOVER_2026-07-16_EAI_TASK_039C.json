@@ -5,7 +5,7 @@
   "repo": "moh0709/hermes-agent",
   "branch": "eai-task-039c",
   "starting_commit_sha": "26e26f1870777a7ca1853bbdf18fc789699efcf2",
-  "deployed_commit_sha": "26e26f1870777a7ca1853bbdf18fc789699efcf2",
+  "deployed_commit_sha": "867c15917be2e7bfb4f6f7a5b4d19cb4cc8b0f1f",
   "service": {
     "name": "hermes-gateway.service",
     "main_pid": 3384618,
@@ -18,7 +18,7 @@
       "gateway/platforms/slack.py",
       "tests/gateway/test_slack_compat_module.py"
     ],
-    "summary": "Add a lazy compatibility shim for the legacy Slack gateway module path and tests proving it imports without eagerly loading the plugin."
+    "summary": "Add a lazy compatibility shim for the legacy Slack gateway module path, plus a deterministic regression test for the Slack-unavailable case and an unrelated-platform import guard."
   },
   "live_send_evidence": {
     "command": "hermes send --json --to telegram \"EAI-TASK-039C verification: gateway.platforms.slack import path is available.\"",
@@ -32,8 +32,9 @@
   },
   "validation": {
     "command": "scripts/run_tests.sh tests/gateway/test_slack_compat_module.py tests/gateway/test_webhook_dynamic_routes.py tests/gateway/test_webhook_adapter.py tests/gateway/test_webhook_deliver_only.py tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q",
-    "result": "119 passed, 0 failed",
-    "git_diff_check": "clean"
+    "result": "120 passed, 0 failed",
+    "git_diff_check": "clean",
+    "new_regression_test": "tests/gateway/test_slack_compat_module.py::TestGatewaySlackCompatModule::test_missing_slack_adapter_raises_clear_platform_error_and_leaves_other_platforms_intact"
   },
   "artifacts": {
     "report": "REPORTS/EAI-TASK-039C-GATEWAY-PLATFORM-IMPORT-REPAIR.md",
