@@ -168,6 +168,36 @@ class WebhookAdapter(BasePlatformAdapter):
             script_timeout_seconds=self._script_timeout_seconds
         )
 
+    def _normalize_route_delivery(self, name: str, route: dict) -> dict:
+        """Normalize unsafe delivery targets for webhook-backed issue routes.
+
+        GitHub issue intake routes must not deliver back into Telegram chat.
+        When a route looks like the autonomous issue queue path, force it to
+        log delivery so the webhook handler can still execute the agent/tooling
+        flow without turning Telegram into a webhook conversation surface.
+        """
+        deliver = route.get("deliver", "log")
+        events = route.get("events", [])
+        prompt = str(route.get("prompt", ""))
+        if (
+            deliver == "telegram"
+            and isinstance(events, list)
+            and "issues" in events
+            and (
+                name.startswith("github-")
+                or "pm:ready" in prompt
+                or "hermes:ready" in prompt
+                or "GitHub issue" in prompt
+            )
+        ):
+            logger.warning(
+                "[webhook] Route '%s' targets Telegram for GitHub issue intake; forcing log delivery so Telegram chat stays out of webhook runs.",
+                name,
+            )
+            route = dict(route)
+            route["deliver"] = "log"
+        return route
+
     # ------------------------------------------------------------------
     # Lifecycle
     # ------------------------------------------------------------------
@@ -178,6 +208,7 @@ class WebhookAdapter(BasePlatformAdapter):
 
         # Validate routes at startup — secret is required per route
         for name, route in self._routes.items():
+            route = self._normalize_route_delivery(name, route)
             secret = route.get("secret", self._global_secret)
             if not secret:
                 raise ValueError(
@@ -420,7 +451,7 @@ class WebhookAdapter(BasePlatformAdapter):
                         self._host,
                     )
                     continue
-                new_dynamic[k] = v
+                new_dynamic[k] = self._normalize_route_delivery(k, dict(v))
             self._dynamic_routes = new_dynamic
             self._routes = {**self._dynamic_routes, **self._static_routes}
             self._dynamic_routes_mtime = mtime

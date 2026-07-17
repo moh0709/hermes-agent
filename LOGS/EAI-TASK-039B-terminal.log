@@ -1,0 +1,48 @@
+EAI-TASK-039B terminal evidence log
+=================================
+
+Working tree:
+- repo: /root/.hermes/hermes-agent
+- branch: eai-task-039b
+- upstream: NousResearch/hermes-agent (READ)
+- fork: moh0709/hermes-agent (admin permission available via gh)
+
+Key commands and outcomes:
+
+1) Auth / remote inspection
+- `gh auth status` -> logged in as moh0709 with repo scope
+- `gh repo view --json nameWithOwner,url,defaultBranchRef,viewerPermission` -> NousResearch/hermes-agent, viewerPermission READ
+- `gh repo view moh0709/hermes-agent --json nameWithOwner,url,viewerPermission,defaultBranchRef` -> viewerPermission ADMIN
+- `git remote -v` showed:
+  - origin -> https://github.com/NousResearch/hermes-agent.git
+  - myfork -> git@github.com:moh0709/hermes-agent.git
+- `git ls-remote --heads myfork` failed with `Host key verification failed`
+- `ssh -T git@github.com -o StrictHostKeyChecking=accept-new` -> `Permission denied (publickey)`
+
+2) Claim evidence
+- Issue #71 was moved from `hermes:ready` to `hermes:working`
+- Claim comment posted, but the first draft omitted the SHA because of shell quoting; a corrected completion comment will include the exact SHA
+
+3) Validation commands
+- `node scripts/framework-doctor.mjs`
+  - failed: file not present in checkout
+- `node --test tests/*.test.mjs`
+  - passed with `1..0` because there are no matching .mjs tests at repo root
+- `npm test`
+  - failed: missing `test` script in root package.json
+- `git diff --check`
+  - passed cleanly
+- `scripts/run_tests.sh tests/gateway/test_webhook_dynamic_routes.py tests/skills/test_watch_github_runtime_mode.py -- -o addopts='' -q`
+  - passed: 19 tests total, 19 passed
+- direct `python3 -m pytest` against the same files initially failed because the repo config injects `--timeout=30 --timeout-method=signal`; rerunning with `-o addopts=''` succeeded via the repo test runner
+
+4) Local code changes being prepared for review
+- `optional-skills/devops/watchers/SKILL.md`
+- `optional-skills/devops/watchers/scripts/watch_github.py`
+- `optional-skills/devops/watchers/scripts/runtime_mode.py`
+- `tests/skills/test_watch_github_runtime_mode.py`
+
+5) Publication blocker and remediation
+- blocker: HTTPS push to the fork remote was rejected by GitHub because the authorized token does not include the `workflow` scope required for this repository push path
+- attempted remediation: switched the fork remote to HTTPS and tried `git push -u myfork eai-task-039b`
+- exact next remediation: authorize a token with `repo, workflow` scope (or complete `gh auth refresh -h github.com -s workflow` in a logged-in browser), then retry the push and post the reviewable branch/commit back to issue #71
